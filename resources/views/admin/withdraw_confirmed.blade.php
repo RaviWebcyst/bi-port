@@ -42,6 +42,7 @@
                                 <th>User Id</th>
                                 <th>Name</th>
                                 <th>Amount</th>
+                                <th>Withdraw Id</th>
                                 <th>Date</th>
                               </tr>
                             </thead>
@@ -53,6 +54,7 @@
                                     <td>{{$withdraw->user->uid}}</td>
                                     <td>{{$withdraw->user->name}}</td>
                                     <td>${{$withdraw->amount}}</td>
+                                    <td>{{$withdraw->hex}}</td>
                                     <td>{{$withdraw->updated_at}}</td>
                                 </tr>
                                 @endforeach

@@ -12,6 +12,8 @@ use App\withdraw;
 use App\invest_active;
 use App\invest_pack;
 use App\pack_active;
+use App\withdraw_log;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -166,12 +168,62 @@ class AdminController extends Controller
 
     // confirm withdraw
     public function confirmWithdraw(Request $request){
+
+
       $withdraw = withdraw::where("id",$request->withdraw_id)->first();
-      $withdraw->remarks = $request->remarks;
-      $withdraw->status = "confirmed";
-      $withdraw->confirm_date = Carbon::now();
-      $withdraw->save();
-      return redirect()->back()->with("success","Request Confirmed");
+      $user = User::where("id",$withdraw->userId)->first();
+
+      include app_path() . '/Http/Controllers/init.php';
+      $coin->Setup('4D8ea842e25722a24FdF24fcA940a4d919B5BBD4233b48a55D8B62aeA915C46E', '6570b8a7528506e26c1dc0107ee2754c2d21d2ad636474a259dfa2441bbc4c1c');
+      $amount = $request->amount;
+      $currency = "USDT.TRC20";
+      // $address = $user->address;
+      $req = [
+          'amount' => $amount,
+          'currency' =>$currency,
+          'address' => $user->address,
+          // 'ipn_url'=> "http://mern-stack.live/vue/api/withdraw_callback",
+      ];
+        $result = $coin->CreateWithdrawal($amount,$currency,$user->address,1);
+        print_r($result);
+        print_r($result["error"]);
+
+        if($result["error"]== "ok"){
+          wallet::create([
+              "userId" => $user->id,
+              "user_id" => $user->uid,
+              "amount" => $request->total,
+              "description" => "amount is withdraw from coinpayment",
+              "wallet_type" => "USD",
+              "transaction_type"=>"withdraw",
+              "type"=>"debit",
+              "hex"=>$result['result']['id']
+          ]);
+
+          $withdraw->amount = $request->amount;
+          $withdraw->remarks = $request->remarks;
+          $withdraw->hex = $result['result']['id'];
+          $withdraw->status = "confirmed";
+          $withdraw->confirm_date = Carbon::now();
+          $withdraw->save();
+
+          $logs = new withdraw_log();
+          $logs->withdraw_id = $request->withdraw_id;
+          $logs->response = json_encode($result);
+          $logs->save();
+
+          return redirect()->back()->with("success","Request Confirmed");
+        }
+        else{
+            $logs = new withdraw_log();
+            $logs->withdraw_id = $request->withdraw_id;
+            $logs->response = json_encode($result);
+            $logs->save();
+            print_r($result);
+            return redirect()->back()->with("error",$result['error']);
+
+
+      }
 
     }
 

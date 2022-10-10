@@ -12,9 +12,15 @@
                             <div class="alert alert-success" v-if="success!=''">{{success}}</div>
                             <div class="card-header bg-white pt-3 pb-3">
                                 <h5 class="mb-0">Withdraw</h5>
-                                <small class="text-warning">Minimum Withdraw Amount is $2</small>
+                                <small class="text-warning">Minimum Withdraw Amount is $2</small></br>
+                                <small class="text-warning">It takes 5-10 minutes to recieve in your wallet</small>
                             </div>
                             <div class="card-body ">
+                            <label class="form-label">Withdraw Address</label>
+                            <div class="form-group">
+                                <input class="form-control" type="text" placeholder="Enter your withdraw address"
+                                    v-model="form.address" :readonly="form.address != null?true:false" required>
+                            </div>
                                 <label class="form-label">Amount</label>
                                 <div class="form-group">
                                     <input class="form-control" type="text" placeholder="Enter Amount to Withdraw"
@@ -49,9 +55,11 @@ export default {
             form: {
                 amount: "",
                 password: "",
+                address:""
             },
             error:"",
-            success:""
+            success:"",
+
         }
     },
     methods: {
@@ -59,7 +67,8 @@ export default {
             axios.post("api/withdraw", {
                 amount: this.form.amount,
                 password: this.form.password,
-                token:localStorage.getItem('usertoken')
+                token:localStorage.getItem('usertoken'),
+                address:this.form.address,
             },
                 {
                     headers: {
@@ -107,6 +116,7 @@ export default {
                 localStorage.setItem("path","Index");
                 this.$router.push({name:"Index"});
             }
+            this.form.address= res.data.user.address;
 
         })
         .catch((err) => {

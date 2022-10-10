@@ -289,18 +289,18 @@ class UserController extends Controller
         $pack_invest = pack_active::where('userId',$user->id)->first();
         if(empty($pack_invest)){
 
-        if($balance > $request->amount){
+        if($balance >= $request->amount){
             $active = new pack_active();
             $active->userId = $user->id;
             $active->package = $package->id;
             $active->status = "paid";
             $active->save();
 
-            $invest = new invest_active();
-            $invest->userId = $user->id;
-            $invest->pack = $package->id;
-            $invest->invested = $request->amount;
-            $invest->save();
+            // $invest = new invest_active();
+            // $invest->userId = $user->id;
+            // $invest->pack = $package->id;
+            // $invest->invested = $request->amount;
+            // $invest->save();
 
             $wallet = new wallet();
             $wallet->user_id = $log_usr->uid;
@@ -320,7 +320,7 @@ class UserController extends Controller
             ]);
 
             $usr = User::where("uid",$user->spid)->first();
-            $income = 0.1*$request->amount;
+            $income = 0.3*$request->amount;
             $wallet = new wallet();
             $wallet->user_id = $user->spid;
             $wallet->userId = $usr->id;
@@ -440,7 +440,7 @@ class UserController extends Controller
         $debit = wallet::where("wallet_type","USD")->where("user_id",$user->uid)->where("type","debit")->sum('amount');
         $balance = $credit - $debit;
 
-        if($balance > $request->amount){
+        if($balance >= $request->amount){
 
         $wallet = new wallet();
         $wallet->user_id = $user->uid;
@@ -487,7 +487,7 @@ class UserController extends Controller
         $debit = wallet::where("wallet_type","epin")->where("user_id",$user->uid)->where("type","debit")->sum('amount');
         $balance = $credit - $debit;
 
-        if($balance > $request->amount){
+        if($balance >= $request->amount){
 
         $wallet = new wallet();
         $wallet->user_id = $user->uid;
@@ -599,7 +599,7 @@ class UserController extends Controller
         $with->amount = $amount;
         $with->admin_fee = $fee;
         $with->total = $request->amount;
-        $with->wallet_type = "epin";
+        $with->wallet_type = "USD";
         $with->status = "pending";
         $with->description = "Withdraw request by name:- ".$user->name." user_id:- ".$user->uid;
         $with->save();
@@ -613,23 +613,32 @@ class UserController extends Controller
 
     public function withdraw(Request $request){
         $user = JWTAuth::parseToken()->authenticate();
+
+
         // return response($request->password);
         if($user->showPass == $request->password){
+
+          if($user->address == ""){
+            User::where("id",$user->id)->update([
+              "address"=>$request->address
+            ]);
+          }
+
             $credit = wallet::where("wallet_type","USD")->where("user_id",$user->uid)->where("type","credit")->sum('amount');
             $debit = wallet::where("wallet_type","USD")->where("user_id",$user->uid)->where("type","debit")->sum('amount');
             $balance = $credit - $debit;
 
-            if($balance > $request->amount && $request->amount >= 2){
+            if($balance >= $request->amount && $request->amount >= 2){
 
-                $wallet = new wallet();
-                $wallet->user_id = $user->uid;
-                $wallet->userId = $user->id;
-                $wallet->amount = $request->amount;
-                $wallet->transaction_type = "withdraw";
-                $wallet->wallet_type = "USD";
-                $wallet->type="debit";
-                $wallet->description = "Withdraw request by name:- ".$user->name." user_id:- ".$user->uid;
-                $wallet->save();
+                // $wallet = new wallet();
+                // $wallet->user_id = $user->uid;
+                // $wallet->userId = $user->id;
+                // $wallet->amount = $request->amount;
+                // $wallet->transaction_type = "withdraw";
+                // $wallet->wallet_type = "USD";
+                // $wallet->type="debit";
+                // $wallet->description = "Withdraw request by name:- ".$user->name." user_id:- ".$user->uid;
+                // $wallet->save();
 
                 $fee = 0.1*$request->amount;
                 $amount = $request->amount - $fee;

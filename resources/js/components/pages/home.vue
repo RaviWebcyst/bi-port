@@ -50,7 +50,7 @@
                                                         E-Wallet
                                                     </p>
                                                     <h5 class="font-weight-bolder mb-0">
-                                                        $ {{ wallet }}
+                                                        $ {{ wallet.toFixed(2) }}
                                                         <!-- <span
                                                             class="text-success text-sm font-weight-bolder">+55%</span> -->
                                                     </h5>
@@ -826,7 +826,7 @@ export default {
             this.balance = res.data.balance;
             this.investment = res.data.invest;
             this.wallet = res.data.wallet;
-            this.direct_bonus = res.data.direct_bonus.toFixed(2);
+            this.direct_bonus = res.data.direct_bonus;
             this.dailyProfit = res.data.dailyProfit;
             this.totalWithdraw = res.data.totalWithdraw;
             this.loading=false;

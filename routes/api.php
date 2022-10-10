@@ -57,5 +57,7 @@ Route::get("direct_bonus","UserController@directBonus");
 Route::get("daily_profit","UserController@dailyProfit");
 
 Route::post("cancelWithdraw",'CoinPaymentsController@cancelWithdraw');
+Route::get("withdrawHistory",'CoinPaymentsController@withdrawHistory');
+
 
 Route::post("investment_withdraw","UserController@investment_withdraw");

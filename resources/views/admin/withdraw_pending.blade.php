@@ -57,7 +57,7 @@
                                     <td>${{$withdraw->amount}}</td>
                                     <td>{{$withdraw->created_at}}</td>
                                     <td>
-                                      <button type="button" class="btn btn-info mt-1 model-animation-btn" data-animation="zoomIn" data-toggle="modal" data-target="#confirm-model" data-id="{{$withdraw->id}}" id="confirm">Confirm  </button>
+                                      <button type="button" class="btn btn-info mt-1 model-animation-btn" data-animation="zoomIn" data-toggle="modal" data-target="#confirm-model" data-id="{{$withdraw->id}}" id="confirm" data-amount="{{$withdraw->amount}}">Confirm  </button>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -88,6 +88,11 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="withdraw_id" value="" id="withdraw">
+                    <label for="">Amount</label>
+
+                    <input type="text" name="amount" value="" id="amount" class="form-control">
+
+                    <label for="">Remarks</label>
                     <textarea name="remarks" rows="3" class="form-control border-dark"></textarea>
                 </div>
                 <div class="modal-footer">
@@ -103,7 +108,11 @@
   $(document).ready(function(){
   $("#confirm").click(function(){
       var id = $(this).data("id");
+      var amount = $(this).data("amount");
+
       $("#withdraw").val(id);
+      $("#amount").val(amount);
+
     });
   });
 </script>

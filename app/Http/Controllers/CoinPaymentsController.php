@@ -154,4 +154,8 @@ class CoinPaymentsController extends Controller
       return response($result);
     }
 
+    public function withdrawHistory(Request $request){
+
+    }
+
 }
